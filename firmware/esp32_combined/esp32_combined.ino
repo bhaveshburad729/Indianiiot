@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
 // ==========================================
@@ -8,9 +9,9 @@
 const char* ssid = "YOUR_WIFI_SSID";         // REPLACE WITH YOUR WIFI NAME
 const char* password = "YOUR_WIFI_PASSWORD"; // REPLACE WITH YOUR WIFI PASSWORD
 
-// LOCAL SERVER URL 
-// (Ensure this matches your computer's IP from ipconfig)
-const char* apiBase = "http://192.168.1.7:8000/api/v1";
+// HOSTED SERVER URL 
+// (Ensure this matches your production Render URL)
+const char* apiBase = "https://mq-gas-censor-sensegrid-api-tronix.onrender.com/api/v1";
 
 // ==========================================
 // 2. DEVICE CONFIGURATION
@@ -140,7 +141,8 @@ void loop() {
 // HTTP HELPER (Simplified for robustness)
 // -----------------------------------------------------
 void postData(String endpoint, String payload) {
-  WiFiClient client; // IMPORTANT: Regular Client for HTTP (Not Secure)
+  WiFiClientSecure client; // Using Secure Client for HTTPS
+  client.setInsecure();
   HTTPClient http;
 
   String url = String(apiBase) + endpoint;
@@ -222,7 +224,8 @@ void sendLdrData(int digitalVal, int analogVal) {
 // Endpoint: /ldr/{id}/outputs
 // -----------------------------------------------------
 void pollOutputs() {
-  WiFiClient client;
+  WiFiClientSecure client;
+  client.setInsecure();
   HTTPClient http;
 
   String url = String(apiBase) + "/ldr/" + String(deviceId) + "/outputs";
